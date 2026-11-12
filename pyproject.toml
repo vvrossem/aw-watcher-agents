@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aw-watcher-agents"
+version = "0.1.0"
+description = "ActivityWatch watcher for AI coding agents: one event per agent turn, parallel sessions kept apart"
+readme = "README.md"
+license = {text = "MPL-2.0"}
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+aw-watcher-agents = "aw_watcher_agents.__main__:main"
+
+[tool.setuptools]
+packages = ["aw_watcher_agents"]

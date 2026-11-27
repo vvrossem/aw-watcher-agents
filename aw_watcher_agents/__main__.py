@@ -9,8 +9,8 @@ import shlex
 import shutil
 import sys
 import urllib.error
-
 from . import hooks
+from . import copilot
 from .client import Client
 
 CLIENT = "aw-watcher-agents"
@@ -161,6 +161,16 @@ def cmd_flush(a) -> None:
     print(f"{flush(a)} events sent")
 
 
+def cmd_copilot(a) -> None:
+    copilot.run(
+        writer(a),
+        interval=a.interval,
+        once=a.once,
+        prompt_mode=a.prompt_mode,
+        prompt_chars=a.prompt_chars,
+    )
+
+
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog=CLIENT, description=__doc__)
     p.add_argument("--host", default="localhost")
@@ -179,12 +189,20 @@ def parser() -> argparse.ArgumentParser:
     install.add_argument("--prompt-chars", type=int, default=200)
     install.add_argument("--max-gap", type=int, default=30)
     sub.add_parser("flush", help="send the events kept while aw-server didn't answer")
+    copilot_cmd = sub.add_parser("copilot", help="poll GitHub Copilot session events")
+    copilot_cmd.add_argument("--once", action="store_true", help="scan once instead of running continuously")
+    copilot_cmd.add_argument("--interval", type=float, default=2.0, help="seconds between scans")
+    copilot_cmd.add_argument("--prompt-mode", choices=("full", "truncate", "hash", "none"), default="full")
+    copilot_cmd.add_argument("--prompt-chars", type=int, default=200)
     return p
 
 
 def main(argv=None) -> None:
-    a = parser().parse_args(argv)
-    {"hook": cmd_hook, "install": cmd_install, "flush": cmd_flush}[a.cmd](a)
+    args = list(argv) if argv is not None else sys.argv[1:]
+    if not args:
+        args = ["copilot"]
+    a = parser().parse_args(args)
+    {"hook": cmd_hook, "install": cmd_install, "flush": cmd_flush, "copilot": cmd_copilot}[a.cmd](a)
 
 
 if __name__ == "__main__":

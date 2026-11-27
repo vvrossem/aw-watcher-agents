@@ -7,6 +7,14 @@ several run at once or you're away.
 It works with [Claude Code](https://claude.com/claude-code) through its
 [hooks](https://code.claude.com/docs/en/hooks.md). Nothing runs in the background.
 
+GitHub Copilot in VS Code is also supported by polling the session event stream in
+`~/.copilot/session-state`. Run `aw-watcher-agents copilot` continuously, or add
+`aw-watcher-agents` as an aw-qt module. With no subcommand, `aw-watcher-agents` starts
+the Copilot poller. Claude Code continues to use its hooks.
+
+The poller reads persisted `events.jsonl` files. It uses `session.idle` and
+`session.task_complete` when available, and `user.message` boundaries for turns otherwise.
+
 ## Install
 
 ```sh
